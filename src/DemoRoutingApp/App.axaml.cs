@@ -2,40 +2,65 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-
 using DemoRoutingApp.ViewModels;
 using DemoRoutingApp.Views;
+using HotAvalonia;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 
 namespace DemoRoutingApp;
 
 public partial class App : Application
 {
+    public static readonly IServiceProvider? ServiceProvider = BuildDependencyGraph().BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+
+    public static ServiceCollection BuildDependencyGraph()
+    {
+        ServiceCollection services = new();
+        services.AddLoggingService();
+        services.RegisterApplicationServices();
+        return services;
+    }
+
     public override void Initialize()
     {
+        this.EnableHotReload();
         AvaloniaXamlLoader.Load(this);
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Line below is needed to remove Avalonia data validation.
-        // Without this line you will get duplicate validations from both Avalonia and CT
-        BindingPlugins.DataValidators.RemoveAt(0);
+        DisableAvaloniaDataAnnotationValidation();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                DataContext = ServiceProvider.GetRequiredService<MainWindowViewModel>()
             };
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
             singleViewPlatform.MainView = new MainView
             {
-                DataContext = new MainViewModel()
+                DataContext = ServiceProvider.GetRequiredService<MainViewModel>()
             };
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void DisableAvaloniaDataAnnotationValidation()
+    {
+        // Get an array of plugins to remove
+        var dataValidationPluginsToRemove =
+            BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
+
+        // remove each entry found
+        foreach (var plugin in dataValidationPluginsToRemove)
+        {
+            BindingPlugins.DataValidators.Remove(plugin);
+        }
     }
 }
