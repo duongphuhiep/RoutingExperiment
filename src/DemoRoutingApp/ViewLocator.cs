@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using CommunityToolkit.Mvvm.ComponentModel;
+using DemoRoutingApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ public class ViewLocator : IDataTemplate
         var viewModelFullTypeName = viewModelType.FullName;
         if (string.IsNullOrEmpty(viewModelFullTypeName)) { return NotFound("Null"); }
 
-        if (viewModel is not ObservableObject)
+        if (viewModel is not ViewModelBase)
         {
             return NotFound($"{viewModelFullTypeName} is not a ViewModel");
         }
@@ -82,5 +82,5 @@ public class ViewLocator : IDataTemplate
     }
     private Control NotFound(string message) => new TextBlock { Text = "Control not found. " + message };
 
-    public bool Match(object? data) => data is ObservableObject;
+    public bool Match(object? data) => data is ViewModelBase;
 }

@@ -22,17 +22,31 @@ internal static class Ioc
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static ServiceCollection RegisterApplicationServices(this ServiceCollection services)
+    public static ServiceCollection RegisterViewModels(this ServiceCollection services)
     {
         services.AddSingleton<AddressBarViewModel>();
-        services.AddTransient<AddressBar>();
-
         services.AddSingleton<MainWindowViewModel>();
-        services.AddTransient<MainWindow>();
-
         services.AddSingleton<MainViewModel>();
-        services.AddTransient<MainView>();
+        services.AddSingleton<WalletsViewModel>();
+        services.AddSingleton<TransfersViewModel>();
+        return services;
+    }
 
+    /// <summary>
+    /// Registration for application
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static ServiceCollection RegisterViews(this ServiceCollection services)
+    {
+        //all routeable view should be registered as scoped
+        services.AddScoped<AddressBar>();
+        services.AddScoped<MainWindow>();
+        services.AddScoped<MainView>();
+        services.AddScoped<WalletsView>();
+        services.AddScoped<TransfersView>();
+
+        //other view should be registered as transient
         return services;
     }
 }

@@ -1,8 +1,9 @@
 <UserControl x:Class="DemoRoutingApp.Views.MainView" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:vm="using:DemoRoutingApp.ViewModels"
-             d:DesignHeight="450" d:DesignWidth="800" xmlns:local="using:DemoRoutingApp"
-             x:DataType="vm:MainViewModel" mc:Ignorable="d">
+             xmlns:local="using:DemoRoutingApp" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DemoRoutingApp.ViewModels" d:DesignHeight="450"
+             d:DesignWidth="800" x:DataType="vm:MainViewModel"
+             mc:Ignorable="d">
     <Design.DataContext>
         <!--
             This only sets the DataContext for the previewer in an IDE,
@@ -12,6 +13,24 @@
     </Design.DataContext>
 
 
-    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-               Text="{Binding Greeting}" />
+    <TabControl Margin="5"
+                ItemsSource="{Binding Tabs}"
+                SelectedValue="{Binding SelectedTabValue}"
+                TabStripPlacement="Bottom">
+        <TabControl.ItemTemplate>
+            <DataTemplate DataType="vm:TabItemViewModel">
+                <StackPanel Orientation="Vertical">
+                    <!--<TextBlock>Icon</TextBlock>-->
+                    <TextBlock Text="{Binding Header}" />
+                </StackPanel>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+
+        <TabControl.ContentTemplate>
+            <DataTemplate DataType="vm:TabItemViewModel">
+                <ContentControl Content="{Binding Content}" />
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+
+    </TabControl>
 </UserControl>

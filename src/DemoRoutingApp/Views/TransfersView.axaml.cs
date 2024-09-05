@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace DemoRoutingApp.Views;
 
-public partial class AddressBar : UserControl
+public partial class TransfersView : UserControl
 {
-    public AddressBar()
+    public TransfersView()
     {
         InitializeComponent();
     }

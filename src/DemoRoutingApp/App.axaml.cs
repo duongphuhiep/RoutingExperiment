@@ -2,6 +2,7 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using DemoRoutingApp.BusinessLogic;
 using DemoRoutingApp.ViewModels;
 using DemoRoutingApp.Views;
 using HotAvalonia;
@@ -13,13 +14,18 @@ namespace DemoRoutingApp;
 
 public partial class App : Application
 {
-    public static readonly IServiceProvider? ServiceProvider = BuildDependencyGraph().BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+    public static readonly IServiceProvider ServiceProvider = BuildDependencyGraph()
+        .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true })
+        .CreateScope() //root scope
+        .ServiceProvider;
 
     public static ServiceCollection BuildDependencyGraph()
     {
         ServiceCollection services = new();
         services.AddLoggingService();
-        services.RegisterApplicationServices();
+        services.RegisterViewModels();
+        services.RegisterViews();
+        services.RegisterBusinessLogic();
         return services;
     }
 
