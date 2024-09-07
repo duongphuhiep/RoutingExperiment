@@ -1,4 +1,5 @@
-﻿using DemoRoutingApp.ViewModels;
+﻿using DemoRoutingApp.Models;
+using DemoRoutingApp.ViewModels;
 using DemoRoutingApp.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,11 +25,11 @@ internal static class Ioc
     /// <returns></returns>
     public static ServiceCollection RegisterViewModels(this ServiceCollection services)
     {
-        services.AddSingleton<AddressBarViewModel>();
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<MainViewModel>();
-        services.AddSingleton<WalletsViewModel>();
-        services.AddSingleton<TransfersViewModel>();
+        services.AddTransient<AddressBarViewModel>();
+        services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<MainViewModel>();
+        services.AddTransient<WalletsViewModel>();
+        services.AddTransient<TransfersViewModel>();
         return services;
     }
 
@@ -40,13 +41,19 @@ internal static class Ioc
     public static ServiceCollection RegisterViews(this ServiceCollection services)
     {
         //all routeable view should be registered as scoped
-        services.AddScoped<AddressBar>();
-        services.AddScoped<MainWindow>();
-        services.AddScoped<MainView>();
-        services.AddScoped<WalletsView>();
-        services.AddScoped<TransfersView>();
+        services.AddTransient<AddressBar>();
+        services.AddTransient<MainWindow>();
+        services.AddTransient<MainView>();
+        services.AddTransient<WalletsView>();
+        services.AddTransient<TransfersView>();
 
         //other view should be registered as transient
+        return services;
+    }
+
+    public static ServiceCollection AddRouting(this ServiceCollection services)
+    {
+        services.AddSingleton<INavigator>(RouterConfig.Navigator);
         return services;
     }
 }

@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace DemoRoutingApp.ViewModels;
 
-public partial class TransfersViewModel : ViewModelBase, IRoutable
+public partial class TransfersViewModel : RoutableViewModel
 {
     private readonly ITransferRepository? _transferRepository;
 
     public Task<Transfer[]>? Transfers => LoadTransfers();
-
-    [ObservableProperty]
-    private RouteData _routeData;
 
     [ObservableProperty]
     private bool _isLoading;
@@ -35,6 +32,14 @@ public partial class TransfersViewModel : ViewModelBase, IRoutable
         {
             IsLoading = false;
         }
+    }
+
+    public override void AttachChildrenToRouteDefinitions()
+    {
+    }
+
+    public override void OnRouteChanged(RouteChangedEvent e)
+    {
     }
 }
 

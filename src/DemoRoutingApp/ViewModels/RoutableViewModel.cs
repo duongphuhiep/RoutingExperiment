@@ -1,33 +1,24 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DemoRoutingApp.Models;
-using System.ComponentModel;
+using System;
 
 namespace DemoRoutingApp.ViewModels;
 
-public partial class RoutableViewModel : ViewModelBase, IRoutable
+public abstract partial class RoutableViewModel : ViewModelBase, IRoutableViewModel
 {
     [ObservableProperty]
-    private RouteData routeData;
 
-    public RoutableViewModel()
+    private RouteNodeDefinition? _routeDefinition;
+
+    public void AttachToRouteDefinition(RouteNodeDefinition routeDefinition)
     {
-        RouteData.PropertyChanged += RouteData_PropertyChanged;
+        ArgumentNullException.ThrowIfNull(routeDefinition);
+        routeDefinition.RegisterComponent(this);
+        RouteDefinition = routeDefinition;
     }
 
-    partial void OnRouteDataChanged(RouteData? oldValue, RouteData newValue)
-    {
-        RouteData.PropertyChanged += RouteData_PropertyChanged;
-    }
+    partial void OnRouteDefinitionChanged(RouteNodeDefinition? routeDefinition) => AttachChildrenToRouteDefinitions();
 
-    private void RouteData_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(RouteData.SelectedChild))
-        {
-            return;
-        }
-        OnRouteSelectedChildChanged();
-    }
-
-    protected virtual void OnRouteSelectedChildChanged() { }
-
+    public abstract void AttachChildrenToRouteDefinitions();
+    public abstract void OnRouteChanged(RouteChangedEvent e);
 }

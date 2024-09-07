@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace DemoRoutingApp.ViewModels;
 
-public partial class WalletsViewModel : ViewModelBase, IRoutable
+public partial class WalletsViewModel : RoutableViewModel
 {
     private readonly IWalletRepository? _walletRepository;
-
-    [ObservableProperty]
-    private RouteData _routeData;
 
     public Task<Wallet[]>? Wallets => LoadWallets();
 
@@ -35,6 +32,14 @@ public partial class WalletsViewModel : ViewModelBase, IRoutable
         {
             IsLoading = false;
         }
+    }
+
+    public override void AttachChildrenToRouteDefinitions()
+    {
+    }
+
+    public override void OnRouteChanged(RouteChangedEvent e)
+    {
     }
 }
 

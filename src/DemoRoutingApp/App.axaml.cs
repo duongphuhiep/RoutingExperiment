@@ -15,17 +15,17 @@ namespace DemoRoutingApp;
 public partial class App : Application
 {
     public static readonly IServiceProvider ServiceProvider = BuildDependencyGraph()
-        .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true })
-        .CreateScope() //root scope
-        .ServiceProvider;
+        .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
 
     public static ServiceCollection BuildDependencyGraph()
     {
         ServiceCollection services = new();
         services.AddLoggingService();
+        services.AddRouting();
         services.RegisterViewModels();
         services.RegisterViews();
         services.RegisterBusinessLogic();
+
         return services;
     }
 

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using DemoRoutingApp.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -10,19 +11,30 @@ public partial class MainViewModel : RoutableViewModel
 
     [ObservableProperty]
     private TabItemViewModel? _selectedTabValue;
+    private readonly WalletsViewModel _walletsViewModel;
+    private readonly TransfersViewModel _transfersViewModel;
 
     public MainViewModel(WalletsViewModel walletsViewModel, TransfersViewModel transfersViewModel)
     {
+        this._walletsViewModel = walletsViewModel;
+        this._transfersViewModel = transfersViewModel;
         Tabs = new ObservableCollection<TabItemViewModel>
         {
-            new TabItemViewModel{ Content = walletsViewModel, Header = "Wallets" },
-            new TabItemViewModel{ Content = transfersViewModel, Header = "Transfers" }
+            new() { Content = walletsViewModel, Header = "Wallets" },
+            new() { Content = transfersViewModel, Header = "Transfers" }
         };
+        AttachToRouteDefinition(RouterConfig.Root);
     }
 
-    protected override void OnRouteSelectedChildChanged()
+    public override void AttachChildrenToRouteDefinitions()
     {
-        SelectedTabValue = Tabs.First(t => t.Content?.GetType() == RouteData.SelectedChild?.Component);
+        _walletsViewModel.AttachToRouteDefinition(RouteDefinition!["wallets"]);
+        _transfersViewModel.AttachToRouteDefinition(RouteDefinition["transfers"]);
+    }
+
+    public override void OnRouteChanged(RouteChangedEvent e)
+    {
+        SelectedTabValue = Tabs.First(t => e.NextChildNode!.ComponentType.IsInstanceOfType(t.Content));
     }
 }
 
