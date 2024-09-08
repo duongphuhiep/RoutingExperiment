@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DemoRoutingApp.BusinessLogic;
+using DemoRoutingApp.Models;
 using System;
 using System.Threading.Tasks;
 
 namespace DemoRoutingApp.ViewModels;
 
-public partial class WalletDetailViewModel : ViewModelBase
+public partial class WalletDetailViewModel : RoutableViewModel
 {
     private readonly IWalletRepository? _walletRepository;
 
@@ -16,7 +17,7 @@ public partial class WalletDetailViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLoading;
 
-    public Task<Wallet?> Wallet => WalletId.HasValue ? LoadWallet() : Task.FromResult<Wallet?>(null);
+    public Task<Wallet?> Wallet => LoadWallet();
 
     public WalletDetailViewModel(IWalletRepository? walletRepository)
     {
@@ -40,11 +41,19 @@ public partial class WalletDetailViewModel : ViewModelBase
             IsLoading = false;
         }
     }
+
+    public override void RegisterChildren()
+    {
+    }
+
+    public override void OnRouteChanged(RouteChangedEvent e)
+    {
+    }
 }
 
 public class WalletDetailViewModelForDesigner : WalletDetailViewModel
 {
-    public WalletDetailViewModelForDesigner(IWalletRepository walletRepository) : base(null)
+    public WalletDetailViewModelForDesigner() : base(null)
     {
     }
     protected override async Task<Wallet?> LoadWallet()

@@ -31,14 +31,14 @@ public partial class MainViewModel : RoutableViewModel
             new() { Content = companyWalletsViewModel, Header = "Company Wallets", Name="companyWallets" },
             new() { Content = transfersViewModel, Header = "Transfers", Name="transfers" }
         };
-        AttachToRouteDefinition(RouterConfig.Root);
+        RouterConfig.Root.RegisterComponent(this);
     }
 
-    public override void AttachChildrenToRouteDefinitions()
+    public override void RegisterChildren()
     {
-        _personalWalletsViewModel.AttachToRouteDefinition(RouteDefinition!["personalWallets"]);
-        _companyWalletsViewModel.AttachToRouteDefinition(RouteDefinition!["companyWallets"]);
-        _transfersViewModel.AttachToRouteDefinition(RouteDefinition["transfers"]);
+        RouteDefinition!["personalWallets"].RegisterComponent(_personalWalletsViewModel);
+        RouteDefinition!["companyWallets"].RegisterComponent(_companyWalletsViewModel);
+        RouteDefinition["transfers"].RegisterComponent(_transfersViewModel);
     }
 
     public override void OnRouteChanged(RouteChangedEvent e)

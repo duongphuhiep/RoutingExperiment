@@ -30,6 +30,7 @@ internal static class Ioc
         services.AddTransient<MainViewModel>();
         services.AddTransient<WalletsViewModel>();
         services.AddTransient<TransfersViewModel>();
+        services.AddTransient<WalletDetailViewModel>();
         return services;
     }
 
@@ -46,6 +47,7 @@ internal static class Ioc
         services.AddTransient<MainView>();
         services.AddTransient<WalletsView>();
         services.AddTransient<TransfersView>();
+        services.AddTransient<WalletDetailView>();
 
         //other view should be registered as transient
         return services;

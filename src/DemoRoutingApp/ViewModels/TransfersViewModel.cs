@@ -34,7 +34,7 @@ public partial class TransfersViewModel : RoutableViewModel
         }
     }
 
-    public override void AttachChildrenToRouteDefinitions()
+    public override void RegisterChildren()
     {
     }
 

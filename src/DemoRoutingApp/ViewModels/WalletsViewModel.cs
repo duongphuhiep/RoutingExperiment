@@ -13,24 +13,25 @@ public partial class WalletsViewModel : RoutableViewModel
     private readonly IWalletRepository? _walletRepository;
 
     [ObservableProperty]
-    private WalletType? _walletType;
+    private WalletDetailViewModel _walletDetailViewModel;
 
     [ObservableProperty]
-    public Task<IEnumerable<Wallet>> _wallets;
+    [NotifyPropertyChangedFor(nameof(Wallets))]
+    private WalletType? _walletType;
+
+    public Task<IEnumerable<Wallet>> Wallets => LoadWallets(WalletType);
 
     [ObservableProperty]
     private bool _isLoading;
 
-    public WalletsViewModel(IWalletRepository? walletRepository)
+    [ObservableProperty]
+    private Wallet _selectedWallet;
+
+    public WalletsViewModel(IWalletRepository? walletRepository, WalletDetailViewModel walletDetailViewModel)
     {
         _walletRepository = walletRepository;
+        _walletDetailViewModel = walletDetailViewModel;
     }
-
-    partial void OnWalletTypeChanged(WalletType? value)
-    {
-        _wallets = LoadWallets(value);
-    }
-
 
     protected virtual async Task<IEnumerable<Wallet>> LoadWallets(WalletType? walletType)
     {
@@ -50,8 +51,14 @@ public partial class WalletsViewModel : RoutableViewModel
         }
     }
 
-    public override void AttachChildrenToRouteDefinitions()
+    partial void OnSelectedWalletChanged(Wallet value)
     {
+        _walletDetailViewModel.WalletId = value.Id;
+    }
+
+    public override void RegisterChildren()
+    {
+        RouteDefinition!["walletDetails"].RegisterComponent(WalletDetailViewModel);
     }
 
     public override void OnRouteChanged(RouteChangedEvent e)
@@ -61,7 +68,7 @@ public partial class WalletsViewModel : RoutableViewModel
 
 public class WalletsViewModelForDesigner : WalletsViewModel
 {
-    public WalletsViewModelForDesigner() : base(null)
+    public WalletsViewModelForDesigner() : base(null, new WalletDetailViewModelForDesigner())
     {
     }
 

@@ -59,6 +59,7 @@ public class RouteNodeDefinition
             throw new InvalidCastException($"Component type {component.GetType()} mismatch route type {ComponentType}");
         }
         _components.Add(new WeakReference<IRoutableViewModel>(component));
+        component.RouteDefinition = this;
     }
 
     public void CleanDeadComponents() => _components.RemoveAll(x => !x.TryGetTarget(out _));
@@ -76,7 +77,7 @@ public class RouteNodeDefinition<T> : RouteNodeDefinition where T : IRoutableVie
         ComponentType = typeof(T);
     }
 
-    public RouteNodeDefinition(string pathSegment, params IEnumerable<RouteNodeDefinition> children) : this(pathSegment)
+    public RouteNodeDefinition(string pathSegment, IEnumerable<RouteNodeDefinition> children) : this(pathSegment)
     {
         foreach (var child in children)
         {
