@@ -3,10 +3,10 @@
 internal class Database
 {
     public static readonly List<Wallet> Wallets = new List<Wallet>() {
-        new Wallet { Id = 1, Name = "Wallet 1", Balance = 1000 },
-        new Wallet { Id = 2, Name = "Wallet 2", Balance = 2000 },
-        new Wallet { Id = 3, Name = "Wallet 3", Balance = 3000 },
-        new Wallet { Id = 4, Name = "Wallet 4", Balance = 4000 },
+        new Wallet { Id = 1, Name = "Wallet 1", Balance = 1000, Type=WalletType.Company  },
+        new Wallet { Id = 2, Name = "Wallet 2", Balance = 2000, Type=WalletType.Company  },
+        new Wallet { Id = 3, Name = "Wallet 3", Balance = 3000, Type=WalletType.Personal },
+        new Wallet { Id = 4, Name = "Wallet 4", Balance = 4000, Type=WalletType.Personal  },
     };
     public static readonly List<Transfer> Transfers = new List<Transfer>() {
         new Transfer { Id = 1, WalletSender = 1, WalletReceiver = 2, Amount = 100, Date = DateTime.Now, Comment="Comment 1" },

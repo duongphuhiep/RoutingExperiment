@@ -5,7 +5,7 @@ using Avalonia.Markup.Xaml;
 using DemoRoutingApp.BusinessLogic;
 using DemoRoutingApp.ViewModels;
 using DemoRoutingApp.Views;
-using HotAvalonia;
+//using HotAvalonia;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -31,7 +31,7 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        this.EnableHotReload();
+        //this.EnableHotReload();
         AvaloniaXamlLoader.Load(this);
     }
 

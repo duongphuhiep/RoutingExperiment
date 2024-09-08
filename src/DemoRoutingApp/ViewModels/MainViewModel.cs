@@ -11,36 +11,45 @@ public partial class MainViewModel : RoutableViewModel
 
     [ObservableProperty]
     private TabItemViewModel? _selectedTabValue;
-    private readonly WalletsViewModel _walletsViewModel;
+
+    private readonly WalletsViewModel _personalWalletsViewModel;
+    private readonly WalletsViewModel _companyWalletsViewModel;
     private readonly TransfersViewModel _transfersViewModel;
 
-    public MainViewModel(WalletsViewModel walletsViewModel, TransfersViewModel transfersViewModel)
+    public MainViewModel(WalletsViewModel personalWalletsViewModel, WalletsViewModel companyWalletsViewModel, TransfersViewModel transfersViewModel)
     {
-        this._walletsViewModel = walletsViewModel;
-        this._transfersViewModel = transfersViewModel;
+        _personalWalletsViewModel = personalWalletsViewModel;
+        _personalWalletsViewModel.WalletType = BusinessLogic.WalletType.Personal;
+
+        _companyWalletsViewModel = companyWalletsViewModel;
+        _companyWalletsViewModel.WalletType = BusinessLogic.WalletType.Company;
+
+        _transfersViewModel = transfersViewModel;
         Tabs = new ObservableCollection<TabItemViewModel>
         {
-            new() { Content = walletsViewModel, Header = "Wallets" },
-            new() { Content = transfersViewModel, Header = "Transfers" }
+            new() { Content = personalWalletsViewModel, Header = "Personal Wallets", Name="personalWallets" },
+            new() { Content = companyWalletsViewModel, Header = "Company Wallets", Name="companyWallets" },
+            new() { Content = transfersViewModel, Header = "Transfers", Name="transfers" }
         };
         AttachToRouteDefinition(RouterConfig.Root);
     }
 
     public override void AttachChildrenToRouteDefinitions()
     {
-        _walletsViewModel.AttachToRouteDefinition(RouteDefinition!["wallets"]);
+        _personalWalletsViewModel.AttachToRouteDefinition(RouteDefinition!["personalWallets"]);
+        _companyWalletsViewModel.AttachToRouteDefinition(RouteDefinition!["companyWallets"]);
         _transfersViewModel.AttachToRouteDefinition(RouteDefinition["transfers"]);
     }
 
     public override void OnRouteChanged(RouteChangedEvent e)
     {
-        SelectedTabValue = Tabs.First(t => e.NextChildNode!.ComponentType.IsInstanceOfType(t.Content));
+        SelectedTabValue = Tabs.First(t => e.NextChildNode!.PathSegment == t.Name);
     }
 }
 
 public class MainViewModelForDesigner : MainViewModel
 {
-    public MainViewModelForDesigner() : base(new WalletsViewModelForDesigner(), new TransfersViewModelForDesigner())
+    public MainViewModelForDesigner() : base(new WalletsViewModelForDesigner(), new WalletsViewModelForDesigner(), new TransfersViewModelForDesigner())
     {
     }
 }

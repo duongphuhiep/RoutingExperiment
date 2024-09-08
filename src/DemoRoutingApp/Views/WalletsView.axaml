@@ -1,11 +1,21 @@
 <UserControl x:Class="DemoRoutingApp.Views.WalletsView" xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:vm="using:DemoRoutingApp.ViewModels"
-             d:DesignHeight="450" d:DesignWidth="800"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:bl="using:DemoRoutingApp.BusinessLogic"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:DemoRoutingApp.ViewModels" d:DesignHeight="450"
+             d:DesignWidth="800" x:DataType="vm:WalletsViewModel"
              mc:Ignorable="d">
 
     <Design.DataContext>
         <vm:WalletsViewModelForDesigner />
     </Design.DataContext>
-    Wallets
+    <ListBox ItemsSource="{Binding Wallets^}">
+        <ListBox.ItemTemplate>
+            <DataTemplate DataType="bl:Wallet">
+                <StackPanel Orientation="Horizontal" Spacing="50">
+                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock Text="{Binding Balance}" />
+                </StackPanel>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
 </UserControl>
