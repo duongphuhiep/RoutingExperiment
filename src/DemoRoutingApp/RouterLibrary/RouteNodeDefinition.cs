@@ -75,4 +75,12 @@ public class RouteNodeDefinition<T> : RouteNodeDefinition where T : IRoutableVie
         PathSegment = pathSegment;
         ComponentType = typeof(T);
     }
+
+    public RouteNodeDefinition(string pathSegment, params IEnumerable<RouteNodeDefinition> children) : this(pathSegment)
+    {
+        foreach (var child in children)
+        {
+            AddChild(child);
+        }
+    }
 }
