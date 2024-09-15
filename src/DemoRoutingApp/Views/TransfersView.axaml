@@ -6,5 +6,10 @@
     <Design.DataContext>
         <vm:TransfersViewModelForDesigner />
     </Design.DataContext>
-    Transfers
+    <TextBlock>
+        <!--<TextBlock.Transitions>
+            <PageSlide Duration="0:00:00.500" />
+        </TextBlock.Transitions>-->
+        Transfers
+    </TextBlock>
 </UserControl>

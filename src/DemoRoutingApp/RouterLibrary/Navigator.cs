@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Web;
 
 namespace DemoRoutingApp.Models;
 
@@ -45,7 +43,6 @@ public class Navigator : INavigator
     }
 
     const string RootPath = "/";
-    const string Separator = "/";
 
     private IEnumerable<RouteChangedEvent> GetEventsForPath(string path)
     {
@@ -64,11 +61,13 @@ public class Navigator : INavigator
             nextEvent = routeChangedEvents[i + 1]!;
             yield return currentEvent with
             {
-                NextChildNode = nextEvent.CurrentNode
+                NextChildNode = nextEvent.CurrentNode,
+                NextChildParameters = nextEvent.CurrentParameters
             };
         }
         yield return nextEvent!;
     }
+
     private List<RouteChangedEvent> Parse(string path)
     {
         if (path?.StartsWith(RootPath) != true)
@@ -76,25 +75,25 @@ public class Navigator : INavigator
             throw new ArgumentException($"Path must to start with '{RootPath}'", nameof(path));
         }
 
-        Uri uri = new Uri("route:" + path);
-        NameValueCollection queryString = HttpUtility.ParseQueryString(uri.Query);
+        var parsed = RoutePathParser.Parse(path);
 
         List<RouteChangedEvent> result = new();
         RouteChangedEvent routeChangedEvent = new RouteChangedEvent
         {
             CurrentNode = _root,
             NewPath = path,
-            QueryString = queryString,
             SegmentIndex = 0,
+            CurrentParameters = parsed.Dequeue().Parameters
 
         };
         result.Add(routeChangedEvent);
 
         var currentNode = _root;
-        for (int i = 1; i < uri.Segments.Length; i++) // next node
+        var i = 0;
+        while (parsed.TryDequeue(out var routeSegment))
         {
-            string rawSegment = uri.Segments[i];
-            var segment = CleanSegment(rawSegment);
+            i++;
+            string? segment = routeSegment.Segment;
             if (string.IsNullOrEmpty(segment))
             {
                 throw new InvalidRouteException($"Detected empty segment (at index {i}) in the path: '{path}'");
@@ -105,22 +104,14 @@ public class Navigator : INavigator
             {
                 throw new RouteNotFoundException($"Route's definition not found for the Segment '{segment}' (at index {i}) in the path: '{path}'");
             }
+
             result.Add(routeChangedEvent with
             {
                 CurrentNode = currentNode[segment],
                 SegmentIndex = i,
+                CurrentParameters = routeSegment.Parameters
             });
         }
         return result;
-    }
-    private static string CleanSegment(string rawSegment)
-    {
-        if (string.IsNullOrEmpty(rawSegment))
-        {
-            return string.Empty;
-        }
-        if (rawSegment == RootPath) { return RootPath; }
-        var segment = rawSegment.Replace(Separator, string.Empty);
-        return segment.Trim();
     }
 }

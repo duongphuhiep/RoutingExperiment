@@ -25,12 +25,12 @@ public partial class WalletsViewModel : RoutableViewModel
     private bool _isLoading;
 
     [ObservableProperty]
-    private Wallet _selectedWallet;
+    private Wallet? _selectedWallet;
 
     public WalletsViewModel(IWalletRepository? walletRepository, WalletDetailViewModel walletDetailViewModel)
     {
         _walletRepository = walletRepository;
-        _walletDetailViewModel = walletDetailViewModel;
+        WalletDetailViewModel = walletDetailViewModel;
     }
 
     protected virtual async Task<IEnumerable<Wallet>> LoadWallets(WalletType? walletType)
@@ -53,7 +53,7 @@ public partial class WalletsViewModel : RoutableViewModel
 
     partial void OnSelectedWalletChanged(Wallet value)
     {
-        _walletDetailViewModel.WalletId = value.Id;
+
     }
 
     public override void RegisterChildren()

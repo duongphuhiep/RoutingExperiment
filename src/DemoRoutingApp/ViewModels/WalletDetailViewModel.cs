@@ -10,9 +10,6 @@ public partial class WalletDetailViewModel : RoutableViewModel
 {
     private readonly IWalletRepository? _walletRepository;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Wallet))]
-    private int? _walletId;
 
     [ObservableProperty]
     private bool _isLoading;
@@ -27,14 +24,19 @@ public partial class WalletDetailViewModel : RoutableViewModel
     protected virtual async Task<Wallet?> LoadWallet()
     {
         ArgumentNullException.ThrowIfNull(_walletRepository);
-        if (!WalletId.HasValue)
+        if (RouteSegmentParameters is null)
+        {
+            return null;
+        }
+        var walletId = RouteSegmentParameters["walletId"];
+        if (string.IsNullOrEmpty(walletId))
         {
             return null;
         }
         IsLoading = true;
         try
         {
-            return await _walletRepository.GetWallet(WalletId.Value);
+            return await _walletRepository.GetWallet(1); //TODO
         }
         finally
         {

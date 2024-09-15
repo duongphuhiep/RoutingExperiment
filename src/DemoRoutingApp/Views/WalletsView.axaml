@@ -8,20 +8,26 @@
     <Design.DataContext>
         <vm:WalletsViewModelForDesigner />
     </Design.DataContext>
-    <Grid ColumnDefinitions="auto,*">
-        <ListBox Grid.Column="0"
-                 ItemsSource="{Binding Wallets^}"
-                 SelectedItem="{Binding SelectedWallet}">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="bl:Wallet">
-                    <StackPanel Orientation="Horizontal" Spacing="50">
-                        <TextBlock Text="{Binding Name}" />
-                        <TextBlock Text="{Binding Balance}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <ContentControl Grid.Column="1" Content="{Binding WalletDetailViewModel}" />
-    </Grid>
+
+    <StackPanel>
+        <!--<StackPanel.Transitions>
+            <PageSlide Duration="0:00:00.500" />
+        </StackPanel.Transitions>-->
+        <Grid ColumnDefinitions="auto,*">
+            <ListBox Grid.Column="0"
+                     ItemsSource="{Binding Wallets^}"
+                     SelectedItem="{Binding SelectedWallet}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="bl:Wallet">
+                        <StackPanel Orientation="Horizontal" Spacing="50">
+                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock Text="{Binding Balance}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ContentControl Grid.Column="1" Content="{Binding WalletDetailViewModel}" />
+        </Grid>
+    </StackPanel>
 
 </UserControl>

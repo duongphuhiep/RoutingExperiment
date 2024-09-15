@@ -1,6 +1,8 @@
-﻿using DemoRoutingApp.Models;
+﻿using DemoRoutingApp.BusinessLogic;
+using DemoRoutingApp.Models;
 using DemoRoutingApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Shouldly;
 
 namespace DemoRoutingApp.UnitTests;
@@ -23,5 +25,17 @@ public class NavigatorTests
 
         navigator.Goto("/transfers");
         mainViewModel.SelectedTabValue.Content.ShouldBeOfType<TransfersViewModel>();
+    }
+
+    [Fact]
+    public void WalletsViewModelTest()
+    {
+        IWalletRepository mockRepository = Substitute.For<IWalletRepository>();
+        ServiceCollection services = App.BuildDependencyGraph();
+        services.AddSingleton(mockRepository); //inject a fake repository instead of real repository which access to the database
+        IServiceProvider serviceProviderWithMockRepository = services.BuildServiceProvider();
+
+        WalletsViewModel subjectUnderTest = serviceProviderWithMockRepository.GetRequiredService<WalletsViewModel>();
+        subjectUnderTest.Wallets.ShouldNotBeNull();
     }
 }
