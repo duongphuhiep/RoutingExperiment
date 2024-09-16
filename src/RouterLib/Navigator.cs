@@ -91,11 +91,10 @@ public class Navigator : INavigator
         var currentNode = _root;
         var i = 0;
 
-        while (parsed.Count > 0)
+        while (parsed.TryDequeue(out var routeSegment))
         {
             i++;
-            var routeSegment = parsed.Dequeue();
-            string? segment = routeSegment.Segment;
+            string? segment = routeSegment?.SegmentName;
             if (string.IsNullOrEmpty(segment))
             {
                 throw new InvalidRouteException($"Detected empty segment (at index {i}) in the path: '{path}'");

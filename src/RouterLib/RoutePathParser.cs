@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Text;
 
 namespace Starfruit.RouterLib;
 
 public record RouteSegment
 {
-    public string? Segment { get; set; }
+    public string? SegmentName { get; set; }
     public NameValueCollection Parameters { get; set; } = new NameValueCollection();
 }
 public static class RoutePathParser
@@ -18,14 +17,14 @@ public static class RoutePathParser
         Value
     }
 
-    public static Queue<RouteSegment> Parse(string routePath)
+    public static QueueStack<RouteSegment> Parse(string routePath)
     {
         if (!routePath.EndsWith("/"))
         {
             routePath += '/';
         }
         int cursor = 0;
-        var result = new Queue<RouteSegment>();
+        var result = new QueueStack<RouteSegment>();
         var currentTokenType = TokenType.Segment;
         StringBuilder currentSegment = new();
         StringBuilder currentKey = new();
@@ -55,7 +54,7 @@ public static class RoutePathParser
                     }
                     else // currentTokenType == TokenType.Segment
                     {
-                        currentRouteSegment.Segment = currentSegment.ToString();
+                        currentRouteSegment.SegmentName = currentSegment.ToString();
                     }
                     result.Enqueue(currentRouteSegment);
 
@@ -75,7 +74,7 @@ public static class RoutePathParser
                     }
                     else if (currentTokenType == TokenType.Segment)
                     {
-                        currentRouteSegment.Segment = currentSegment.ToString();
+                        currentRouteSegment.SegmentName = currentSegment.ToString();
                     }
                     else // currentTokenType == TokenType.Key
                     {
@@ -124,5 +123,83 @@ public static class RoutePathParser
         }
 
         return result;
+    }
+
+    public static QueueStack<RouteSegment> ParseRelative(string basePath, string relativePath)
+    {
+        QueueStack<RouteSegment> parsedRelativePath = Parse(relativePath);
+        QueueStack<RouteSegment> result = Parse(basePath);
+        while (parsedRelativePath.TryDequeue(out var segment))
+        {
+            if (segment is null || segment.SegmentName == ".")
+            {
+                continue;
+            }
+            if (segment.SegmentName == "..")
+            {
+                if (result.Count == 0)
+                {
+                    throw new InvalidRouteException($"Cannot go up from '{basePath}'. the relative path '{relativePath}' is too deep.");
+                }
+                result.Pop();
+                continue;
+            }
+            result.Enqueue(segment);
+        }
+
+        return result;
+    }
+
+    public static string EscapeReservesChars(string? s)
+    {
+        if (string.IsNullOrEmpty(s))
+        {
+            return string.Empty;
+        }
+        StringBuilder builder = new();
+        for (int i = 0; i < s!.Length; i++)
+        {
+            var c = s[i];
+            if (c == '\\' || c == '/' || c == ':' || c == '=')
+            {
+                builder.Append('\\');
+            }
+            builder.Append(c);
+        }
+        return builder.ToString();
+    }
+
+    public static string EncodeSegment(string? segmentName, NameValueCollection parameters, bool endsWithSlash = true)
+    {
+        StringBuilder builder = new(EscapeReservesChars(segmentName));
+        foreach (var key in parameters.AllKeys)
+        {
+            foreach (var value in parameters.GetValues(key))
+            {
+                builder.Append(":");
+                builder.Append(EscapeReservesChars(key));
+                builder.Append("=");
+                builder.Append(EscapeReservesChars(value));
+            }
+        }
+        if (endsWithSlash)
+        {
+            builder.Append("/");
+        }
+        return builder.ToString();
+    }
+
+    public static string EncodeSegments(QueueStack<RouteSegment> segments)
+    {
+        StringBuilder builder = new();
+        while (segments.TryDequeue(out var routeSegment))
+        {
+            if (routeSegment is null)
+            {
+                continue;
+            }
+            builder.Append(EncodeSegment(routeSegment.SegmentName, routeSegment.Parameters));
+        }
+        return builder.ToString();
     }
 }
