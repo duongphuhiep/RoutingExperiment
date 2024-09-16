@@ -143,6 +143,7 @@ public class RoutePathParserTests
 
     [Theory()]
     [InlineData("SegmentOnly", "/aa/bb/", "cc/dd", "/aa/bb/cc/dd/")]
+    [InlineData("Removed root", "/aa/bb/", "../../../cc/dd", "cc/dd/")]
     [InlineData("WithDot", "/aa/bb/", "./dd", "/aa/bb/dd/")]
     [InlineData("OneLevelParent", "/aa/bb/", "../dd", "/aa/dd/")]
     [InlineData("TwoLevelParent", "/aa/bb/", "../../dd", "/dd/")]
@@ -152,5 +153,13 @@ public class RoutePathParserTests
     {
         var segments = RoutePathParser.ParseRelative(baseRoute, relativeRoute);
         RoutePathParser.EncodeSegments(segments).ShouldBe(expected);
+    }
+
+    [Theory()]
+    [InlineData("/aa/bb/", "../../../../cc/dd")]
+    public void ParseRelativeFailed(string baseRoute, string relativeRoute)
+    {
+        var ex = Assert.Throws<InvalidRouteException>(() => RoutePathParser.ParseRelative(baseRoute, relativeRoute));
+        _output.WriteLine(ex.Message);
     }
 }

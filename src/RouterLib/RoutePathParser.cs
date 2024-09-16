@@ -139,7 +139,7 @@ public static class RoutePathParser
             {
                 if (result.Count == 0)
                 {
-                    throw new InvalidRouteException($"Cannot go up from '{basePath}'. the relative path '{relativePath}' is too deep.");
+                    throw new InvalidRouteException($"Cannot go up from '{basePath}'. The relative path '{relativePath}' is too deep.");
                 }
                 result.Pop();
                 continue;
