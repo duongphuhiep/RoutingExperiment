@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DemoRoutingApp.BusinessLogic;
-using DemoRoutingApp.Models;
+using Starfruit.RouterLib;
 using System;
 using System.Threading.Tasks;
 

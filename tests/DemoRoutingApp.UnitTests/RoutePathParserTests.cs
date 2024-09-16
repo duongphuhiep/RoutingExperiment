@@ -1,5 +1,5 @@
-using DemoRoutingApp.Models;
 using Shouldly;
+using Starfruit.RouterLib;
 using Xunit.Abstractions;
 
 namespace DemoRoutingApp.UnitTests;

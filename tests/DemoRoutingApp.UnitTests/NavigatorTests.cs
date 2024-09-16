@@ -1,9 +1,9 @@
 ﻿using DemoRoutingApp.BusinessLogic;
-using DemoRoutingApp.Models;
 using DemoRoutingApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;
+using Starfruit.RouterLib;
 
 namespace DemoRoutingApp.UnitTests;
 

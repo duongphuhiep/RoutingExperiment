@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DemoRoutingApp.BusinessLogic;
-using DemoRoutingApp.Models;
+using Starfruit.RouterLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +58,7 @@ public partial class WalletsViewModel : RoutableViewModel
 
     public override void RegisterChildren()
     {
-        RouteDefinition!["walletDetails"].RegisterComponent(WalletDetailViewModel);
+        this.RegisterChild("walletDetails", WalletDetailViewModel);
     }
 
     public override void OnRouteChanged(RouteChangedEvent e)

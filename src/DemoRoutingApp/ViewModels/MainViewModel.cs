@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DemoRoutingApp.Models;
+using Starfruit.RouterLib;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -31,14 +32,14 @@ public partial class MainViewModel : RoutableViewModel
             new() { Content = companyWalletsViewModel, Header = "Company Wallets", Name="companyWallets" },
             new() { Content = transfersViewModel, Header = "Transfers", Name="transfers" }
         };
-        RouterConfig.Root.RegisterComponent(this);
+        this.RegisterAsRoot(RouterConfig.Root);
     }
 
     public override void RegisterChildren()
     {
-        RouteDefinition!["personalWallets"].RegisterComponent(_personalWalletsViewModel);
-        RouteDefinition!["companyWallets"].RegisterComponent(_companyWalletsViewModel);
-        RouteDefinition["transfers"].RegisterComponent(_transfersViewModel);
+        this.RegisterChild("personalWallets", _personalWalletsViewModel);
+        this.RegisterChild("companyWallets", _companyWalletsViewModel);
+        this.RegisterChild("transfers", _transfersViewModel);
     }
 
     public override void OnRouteChanged(RouteChangedEvent e)

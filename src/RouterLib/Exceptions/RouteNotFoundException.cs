@@ -1,4 +1,4 @@
-﻿namespace DemoRoutingApp.Models;
+﻿namespace Starfruit.RouterLib;
 
 public class RouteNotFoundException : RoutingException
 {

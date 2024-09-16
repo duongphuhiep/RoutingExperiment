@@ -1,14 +1,16 @@
-﻿using DemoRoutingApp.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
-namespace DemoRoutingApp.Models;
+namespace Starfruit.RouterLib;
 
 public class RouteNodeDefinition
 {
-    public virtual string PathSegment { get; init; } = string.Empty;
-    public virtual Type ComponentType { get; init; } = typeof(NotFoundViewModel);
+    public override string ToString()
+    {
+        return $"{typeof(RouteNodeDefinition)}({PathSegment}<{ComponentType.FullName}>)";
+    }
+    public virtual string PathSegment { get; internal set; } = string.Empty;
+    public virtual Type ComponentType { get; internal set; }
 
     public RouteNodeDefinition? Parent { get; private set; }
 
@@ -18,7 +20,7 @@ public class RouteNodeDefinition
     /// <summary>
     /// Cache all the components instance correspond to this route node. 
     /// </summary>
-    public IEnumerable<WeakReference<IRoutableViewModel>> Components => _components.ToImmutableList();
+    public IEnumerable<WeakReference<IRoutableViewModel>> Components => _components;
 
     private readonly List<WeakReference<IRoutableViewModel>> _components = new();
 
@@ -44,19 +46,21 @@ public class RouteNodeDefinition
             throw new InvalidOperationException($"Duplicate child path segment: '{child.PathSegment}' in '{PathSegment}'");
         }
         _children[child.PathSegment] = child;
-
         child.Parent = this;
     }
 
     public RouteNodeDefinition this[string pathSegment] => _children[pathSegment];
     public bool HasChild(string pathSegment) => _children.ContainsKey(pathSegment);
-    public void RegisterComponent(IRoutableViewModel component)
+    internal void RegisterComponent(IRoutableViewModel component)
     {
-        ArgumentNullException.ThrowIfNull(component);
+        if (component is null)
+        {
+            throw new ArgumentNullException(nameof(component));
+        }
 
         if (!ComponentType.IsAssignableFrom(component.GetType()))
         {
-            throw new InvalidCastException($"Component type {component.GetType()} mismatch route type {ComponentType}");
+            throw new InvalidCastException($"Component type mismatch route type. Unable to register the component of type {component.GetType()}) to the {ToString()}.");
         }
         _components.Add(new WeakReference<IRoutableViewModel>(component));
         component.RouteDefinition = this;

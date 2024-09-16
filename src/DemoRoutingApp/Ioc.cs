@@ -55,7 +55,7 @@ internal static class Ioc
 
     public static ServiceCollection AddRouting(this ServiceCollection services)
     {
-        services.AddSingleton<INavigator>(RouterConfig.Navigator);
+        services.AddSingleton(RouterConfig.Navigator);
         return services;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Text;
 
-namespace DemoRoutingApp.Models;
+namespace Starfruit.RouterLib;
 
 public record RouteSegment
 {
@@ -20,7 +20,7 @@ public static class RoutePathParser
 
     public static Queue<RouteSegment> Parse(string routePath)
     {
-        if (!routePath.EndsWith('/'))
+        if (!routePath.EndsWith("/"))
         {
             routePath += '/';
         }

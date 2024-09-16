@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using DemoRoutingApp.Models;
+using Starfruit.RouterLib;
 using System.Collections.Specialized;
 
 namespace DemoRoutingApp.ViewModels;
 
 public abstract partial class RoutableViewModel : ViewModelBase, IRoutableViewModel
 {
+    [ObservableProperty]
+
+    private IRoutableViewModel? _parent;
+
     [ObservableProperty]
 
     private RouteNodeDefinition? _routeDefinition;

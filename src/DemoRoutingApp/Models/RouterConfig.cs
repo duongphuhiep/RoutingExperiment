@@ -1,4 +1,5 @@
 ﻿using DemoRoutingApp.ViewModels;
+using Starfruit.RouterLib;
 
 namespace DemoRoutingApp.Models;
 

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DemoRoutingApp.Models;
+using Starfruit.RouterLib;
 using System.Web;
 
 namespace DemoRoutingApp.ViewModels;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DemoRoutingApp.Models;
+namespace Starfruit.RouterLib;
 
 public interface INavigator
 {
@@ -90,9 +90,11 @@ public class Navigator : INavigator
 
         var currentNode = _root;
         var i = 0;
-        while (parsed.TryDequeue(out var routeSegment))
+
+        while (parsed.Count > 0)
         {
             i++;
+            var routeSegment = parsed.Dequeue();
             string? segment = routeSegment.Segment;
             if (string.IsNullOrEmpty(segment))
             {
@@ -100,14 +102,14 @@ public class Navigator : INavigator
             }
 
             //find route definition correspond to this segment
-            if (!currentNode.HasChild(segment))
+            if (!currentNode.HasChild(segment!))
             {
                 throw new RouteNotFoundException($"Route's definition not found for the Segment '{segment}' (at index {i}) in the path: '{path}'");
             }
 
             result.Add(routeChangedEvent with
             {
-                CurrentNode = currentNode[segment],
+                CurrentNode = currentNode[segment!],
                 SegmentIndex = i,
                 CurrentParameters = routeSegment.Parameters
             });
