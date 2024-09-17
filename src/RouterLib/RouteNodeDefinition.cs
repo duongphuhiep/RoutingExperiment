@@ -7,9 +7,9 @@ public class RouteNodeDefinition
 {
     public override string ToString()
     {
-        return $"{typeof(RouteNodeDefinition)}({PathSegment}<{ComponentType.FullName}>)";
+        return $"{nameof(RouteNodeDefinition)}({SegmentName}<{ComponentType.FullName}>)";
     }
-    public virtual string PathSegment { get; internal set; } = string.Empty;
+    public virtual string SegmentName { get; internal set; } = string.Empty;
     public virtual Type ComponentType { get; internal set; }
 
     public RouteNodeDefinition? Parent { get; private set; }
@@ -39,13 +39,13 @@ public class RouteNodeDefinition
     {
         if (child.Parent is not null)
         {
-            throw new InvalidOperationException($"Child '{child.PathSegment}' already has a parent '{child.Parent.PathSegment}'");
+            throw new InvalidOperationException($"Child '{child.SegmentName}' already has a parent '{child.Parent.SegmentName}'");
         }
-        if (_children.ContainsKey(child.PathSegment))
+        if (_children.ContainsKey(child.SegmentName))
         {
-            throw new InvalidOperationException($"Duplicate child path segment: '{child.PathSegment}' in '{PathSegment}'");
+            throw new InvalidOperationException($"Duplicate child path segment: '{child.SegmentName}' in '{SegmentName}'");
         }
-        _children[child.PathSegment] = child;
+        _children[child.SegmentName] = child;
         child.Parent = this;
     }
 
@@ -75,17 +75,24 @@ public class RouteNodeDefinition
 /// <typeparam name="T"></typeparam>
 public class RouteNodeDefinition<T> : RouteNodeDefinition where T : IRoutableViewModel
 {
-    public RouteNodeDefinition(string pathSegment)
+    public RouteNodeDefinition(string segmentName)
     {
-        PathSegment = pathSegment;
+        SegmentName = segmentName;
         ComponentType = typeof(T);
     }
 
-    public RouteNodeDefinition(string pathSegment, IEnumerable<RouteNodeDefinition> children) : this(pathSegment)
+    public RouteNodeDefinition(string segmentName, IEnumerable<RouteNodeDefinition> children) : this(segmentName)
     {
         foreach (var child in children)
         {
             AddChild(child);
         }
+    }
+}
+
+public class RouteRootDefinition<T> : RouteNodeDefinition<T> where T : IRoutableViewModel
+{
+    public RouteRootDefinition(IEnumerable<RouteNodeDefinition> children) : base(string.Empty, children)
+    {
     }
 }

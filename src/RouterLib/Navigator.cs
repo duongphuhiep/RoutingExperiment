@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 
 namespace Starfruit.RouterLib;
 
 public interface INavigator
 {
-    void Goto(string path);
+    string Goto(string targetAbsoluteAddress);
+    string Goto(IRoutableViewModel fromViewModel, string targetRelativeAddress);
 }
 
 public class Navigator : INavigator
@@ -18,35 +17,41 @@ public class Navigator : INavigator
         _root = root;
     }
 
-    public void Goto(string path)
+    public string Goto(string targetAbsoluteAddress)
     {
-        try
+        var parsedPath = RoutePathParser.Parse(targetAbsoluteAddress);
+        Goto(parsedPath);
+        return targetAbsoluteAddress;
+    }
+
+    private void Goto(QueueStack<RouteSegment> parsedPath)
+    {
+        foreach (var e in GetEventsWithCurrentNodeAndNextChildNode(parsedPath))
         {
-            foreach (var e in GetEventsForPath(path))
+            e.CurrentNode.CleanDeadComponents();
+            foreach (var cachedComponent in e.CurrentNode.Components)
             {
-                e.CurrentNode.CleanDeadComponents();
-                foreach (var cachedComponent in e.CurrentNode.Components)
+                cachedComponent.TryGetTarget(out var component);
+                if (component is null)
                 {
-                    cachedComponent.TryGetTarget(out var component);
-                    if (component is null)
-                    {
-                        continue;
-                    }
-                    component.OnRouteChanged(e);
+                    continue;
                 }
+                component.OnRouteChanged(e);
             }
-        }
-        catch (RoutingException ex)
-        {
-            Trace.TraceError("Unable to navigate to path '{0}': {1}", path, ex);
         }
     }
 
-    const string RootPath = "/";
-
-    private IEnumerable<RouteChangedEvent> GetEventsForPath(string path)
+    public string Goto(IRoutableViewModel fromViewModel, string targetRelativeAddress)
     {
-        var routeChangedEvents = Parse(path);
+        var baseAddress = fromViewModel.GetRouteAddress();
+        var absolutePath = RoutePathParser.Combine(baseAddress, targetRelativeAddress);
+        Goto(absolutePath);
+        return absolutePath.ToStringAddress();
+    }
+
+    private IEnumerable<RouteChangedEvent> GetEventsWithCurrentNodeAndNextChildNode(QueueStack<RouteSegment> parsedPath)
+    {
+        var routeChangedEvents = GetEventsWithCurrentNodeOnly(parsedPath);
         if (routeChangedEvents.Count == 1)
         {
             yield return routeChangedEvents[0];
@@ -68,22 +73,14 @@ public class Navigator : INavigator
         yield return nextEvent!;
     }
 
-    private List<RouteChangedEvent> Parse(string path)
+    private List<RouteChangedEvent> GetEventsWithCurrentNodeOnly(QueueStack<RouteSegment> parsedPath)
     {
-        if (path?.StartsWith(RootPath) != true)
-        {
-            throw new ArgumentException($"Path must to start with '{RootPath}'", nameof(path));
-        }
-
-        var parsed = RoutePathParser.Parse(path);
-
         List<RouteChangedEvent> result = new();
         RouteChangedEvent routeChangedEvent = new RouteChangedEvent
         {
             CurrentNode = _root,
-            NewPath = path,
             SegmentIndex = 0,
-            CurrentParameters = parsed.Dequeue().Parameters
+            CurrentParameters = parsedPath.Dequeue().Parameters
 
         };
         result.Add(routeChangedEvent);
@@ -91,26 +88,26 @@ public class Navigator : INavigator
         var currentNode = _root;
         var i = 0;
 
-        while (parsed.TryDequeue(out var routeSegment))
+        while (parsedPath.TryDequeue(out var routeSegment))
         {
             i++;
             string? segment = routeSegment?.SegmentName;
             if (string.IsNullOrEmpty(segment))
             {
-                throw new InvalidRouteException($"Detected empty segment (at index {i}) in the path: '{path}'");
+                throw new InvalidRouteException($"Detected empty segment (at index {i}) in the path");
             }
 
             //find route definition correspond to this segment
             if (!currentNode.HasChild(segment!))
             {
-                throw new RouteNotFoundException($"Route's definition not found for the Segment '{segment}' (at index {i}) in the path: '{path}'");
+                throw new RouteNotFoundException($"Route's definition not found for the Segment '{segment}' (at index {i}) in the path");
             }
 
             result.Add(routeChangedEvent with
             {
                 CurrentNode = currentNode[segment!],
                 SegmentIndex = i,
-                CurrentParameters = routeSegment.Parameters
+                CurrentParameters = routeSegment!.Parameters
             });
         }
         return result;

@@ -46,7 +46,7 @@ public static class RoutePathParser
                     //close the previous Segment
                     if (currentTokenType == TokenType.Key)
                     {
-                        throw new InvalidRouteException($"Unexpected '/' at postion {cursor}. Key: {currentKey} has no value.");
+                        throw new InvalidRouteException($"Unable to parse '{routePath}'. Unexpected '/' at postion {cursor}. Key: {currentKey} has no value.");
                     }
                     else if (currentTokenType == TokenType.Value)
                     {
@@ -78,7 +78,7 @@ public static class RoutePathParser
                     }
                     else // currentTokenType == TokenType.Key
                     {
-                        throw new InvalidRouteException($"Unexpected ':' at postion {cursor}. Key: {currentKey} has no value.");
+                        throw new InvalidRouteException($"Unable to parse '{routePath}'. Unexpected ':' at postion {cursor}. Key: {currentKey} has no value.");
                     }
 
                     //prepare for the next Key
@@ -92,11 +92,11 @@ public static class RoutePathParser
                     //close the previous token
                     if (currentTokenType == TokenType.Value)
                     {
-                        throw new InvalidRouteException($"Unexpected '=' at postion {cursor}. Missing key for the value after '{currentValue}'.");
+                        throw new InvalidRouteException($"Unable to parse '{routePath}'. Unexpected '=' at postion {cursor}. Missing key for the value after '{currentValue}'.");
                     }
                     else if (currentTokenType == TokenType.Segment)
                     {
-                        throw new InvalidRouteException($"Unexpected '=' at postion {cursor}. Cannot assign value to a segment '{currentSegment}'");
+                        throw new InvalidRouteException($"Unable to parse '{routePath}'. Unexpected '=' at postion {cursor}. Cannot assign value to a segment '{currentSegment}'");
                     }
 
                     currentTokenType = TokenType.Value;
@@ -125,7 +125,7 @@ public static class RoutePathParser
         return result;
     }
 
-    public static QueueStack<RouteSegment> ParseRelative(string basePath, string relativePath)
+    public static QueueStack<RouteSegment> Combine(string basePath, string relativePath)
     {
         QueueStack<RouteSegment> parsedRelativePath = Parse(relativePath);
         QueueStack<RouteSegment> result = Parse(basePath);
@@ -189,7 +189,7 @@ public static class RoutePathParser
         return builder.ToString();
     }
 
-    public static string EncodeSegments(QueueStack<RouteSegment> segments)
+    public static string ToStringAddress(this QueueStack<RouteSegment> segments)
     {
         StringBuilder builder = new();
         while (segments.TryDequeue(out var routeSegment))

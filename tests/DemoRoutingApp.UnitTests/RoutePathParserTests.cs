@@ -1,5 +1,6 @@
 using Shouldly;
 using Starfruit.RouterLib;
+using System.Collections.Specialized;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -149,17 +150,69 @@ public class RoutePathParserTests
     [InlineData("TwoLevelParent", "/aa/bb/", "../../dd", "/dd/")]
     [InlineData("AlternateParent", "/aa/bb/cc/", "../dd/ee/../ff", "/aa/bb/dd/ff/")]
     [InlineData("AlternateParent With Parameters", "/aa/bb:k1=v1/cc/", "..:k2=v2/dd:k3=v3/ee:k4=v4/..:k5=v5/ff:k6=v6", "/aa/bb:k1=v1/dd:k3=v3/ff:k6=v6/")]
-    public void ParseRelativeTest(string description, string baseRoute, string relativeRoute, string expected)
+    public void CombineTest(string description, string baseRoute, string relativeRoute, string expected)
     {
-        var segments = RoutePathParser.ParseRelative(baseRoute, relativeRoute);
-        RoutePathParser.EncodeSegments(segments).ShouldBe(expected);
+        var segments = RoutePathParser.Combine(baseRoute, relativeRoute);
+        segments.ToStringAddress().ShouldBe(expected);
     }
 
     [Theory()]
     [InlineData("/aa/bb/", "../../../../cc/dd")]
     public void ParseRelativeFailed(string baseRoute, string relativeRoute)
     {
-        var ex = Assert.Throws<InvalidRouteException>(() => RoutePathParser.ParseRelative(baseRoute, relativeRoute));
+        var ex = Assert.Throws<InvalidRouteException>(() => RoutePathParser.Combine(baseRoute, relativeRoute));
         _output.WriteLine(ex.Message);
+    }
+
+    [Fact]
+    public void GetRouteAddressTest()
+    {
+        //Given routes definition
+        RouteNodeDefinition rootDefinition = new RouteRootDefinition<SomeRoutableVm>([
+                new RouteNodeDefinition<SomeRoutableVm>("a0", [
+                    new RouteNodeDefinition<SomeRoutableVm>("b0", [
+                        new RouteNodeDefinition<SomeRoutableVm>("c0", [
+                        ])
+                    ])
+                ])
+            ]);
+
+        //Given some routable view models 
+        SomeRoutableVm root = new SomeRoutableVm();
+        SomeRoutableVm a0 = new SomeRoutableVm();
+        SomeRoutableVm b0 = new SomeRoutableVm();
+        SomeRoutableVm c0 = new SomeRoutableVm();
+
+        root.RegisterAsRoot(rootDefinition);
+        root.RegisterChild("a0", a0);
+        a0.RegisterChild("b0", b0);
+        b0.RegisterChild("c0", c0);
+
+        b0.RouteSegmentParameters.Add("k1", "v1");
+        c0.RouteSegmentParameters.Add("k2", "v2");
+
+        //When get address of routable view model
+        var address = c0.GetRouteAddress();
+
+        //Then address should be correct
+        address.ShouldBe("/a0/b0:k1=v1/c0:k2=v2/");
+    }
+
+    class SomeRoutableVm : IRoutableViewModel
+    {
+        public IRoutableViewModel? Parent { get; set; }
+        public RouteNodeDefinition? RouteDefinition { get; set; }
+
+        public NameValueCollection RouteSegmentParameters { get; } = new NameValueCollection();
+
+        public void OnRouteChanged(RouteChangedEvent e)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RegisterChildren()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace DemoRoutingApp.Models;
 public static class RouterConfig
 {
     public static readonly RouteNodeDefinition Root =
-        new RouteNodeDefinition<MainViewModel>("/", [
+        new RouteRootDefinition<MainViewModel>([
             new RouteNodeDefinition<TransfersViewModel>("transfers"),
             new RouteNodeDefinition<WalletsViewModel>("personalWallets", [
                 new RouteNodeDefinition<WalletDetailViewModel>("walletDetails")

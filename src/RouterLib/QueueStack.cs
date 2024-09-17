@@ -8,16 +8,13 @@ public class QueueStack<T>
     private readonly LinkedList<T> _list = new LinkedList<T>();
 
     /// <summary>
-    /// Enqueue (FIFO)
+    /// Enqueue (FIFO) AddLast()
     /// </summary>
     /// <param name="item"></param>
-    public void Enqueue(T item)
-    {
-        _list.AddLast(item);
-    }
+    public void Enqueue(T item) => _list.AddLast(item);
 
     /// <summary>
-    /// Dequeue (FIFO)
+    /// Dequeue (FIFO) RemoveFirst()
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
@@ -34,7 +31,7 @@ public class QueueStack<T>
     }
 
     /// <summary>
-    /// Dequeue (FIFO)
+    /// Dequeue (FIFO) RemoveFirst()
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
@@ -48,16 +45,13 @@ public class QueueStack<T>
     }
 
     /// <summary>
-    /// Push (LIFO)
+    /// Push (LIFO) AddLast()
     /// </summary>
     /// <param name="item"></param>
-    public void Push(T item)
-    {
-        _list.AddLast(item);
-    }
+    public void Push(T item) => Enqueue(item);
 
     /// <summary>
-    /// Pop (LIFO)
+    /// Pop (LIFO) RemoveLast()
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
@@ -75,7 +69,7 @@ public class QueueStack<T>
     }
 
     /// <summary>
-    /// Pop (LIFO)
+    /// Pop (LIFO) RemoveLast()
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
@@ -87,6 +81,8 @@ public class QueueStack<T>
         }
         return value!;
     }
+
+    public void Prepend(T item) => _list.AddFirst(item);
 
     public int Count => _list.Count;
 }

@@ -44,7 +44,7 @@ public partial class MainViewModel : RoutableViewModel
 
     public override void OnRouteChanged(RouteChangedEvent e)
     {
-        SelectedTabValue = Tabs.First(t => e.NextChildNode!.PathSegment == t.Name);
+        SelectedTabValue = Tabs.First(t => e.NextChildNode!.SegmentName == t.Name);
     }
 }
 

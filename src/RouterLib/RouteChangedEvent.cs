@@ -8,6 +8,5 @@ public record RouteChangedEvent
     public NameValueCollection CurrentParameters { get; internal set; } = new();
     public RouteNodeDefinition? NextChildNode { get; internal set; }
     public NameValueCollection NextChildParameters { get; internal set; } = new();
-    public string NewPath { get; internal set; } = string.Empty;
     public int SegmentIndex { get; internal set; }
 }
