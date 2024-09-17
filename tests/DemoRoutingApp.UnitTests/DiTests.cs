@@ -1,10 +1,37 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using Starfruit.RouterLib;
 
 namespace DemoRoutingApp.UnitTests;
 
 public class DiTests
 {
+    [Fact]
+    public void UnorderedKeyValueCollectionTest()
+    {
+        UnorderedKeyValueCollection a = new UnorderedKeyValueCollection();
+        UnorderedKeyValueCollection b = new UnorderedKeyValueCollection();
+        a.Add("k1", "v1");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeFalse();
+        b.Add("k1", "v1");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeTrue();
+
+        a.Add("k2", "v2");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeFalse();
+        b.Add("k2", "v2bis");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeFalse();
+        b["k2"] = "v2";
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeTrue();
+
+        b.Add("k3", "v3");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeFalse();
+        b.Add("k3", "v3bis");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeFalse();
+        a.Add("k3", "v3");
+        a.Add("k3", "v3bis");
+        EqualityComparer<UnorderedKeyValueCollection>.Default.Equals(a, b).ShouldBeTrue();
+    }
+
     [Fact]
     public void TransientTest()
     {

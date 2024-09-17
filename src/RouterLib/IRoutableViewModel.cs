@@ -1,6 +1,4 @@
-﻿using System.Collections.Specialized;
-
-namespace Starfruit.RouterLib;
+﻿namespace Starfruit.RouterLib;
 
 public interface IRoutableViewModel
 {
@@ -23,5 +21,5 @@ public interface IRoutableViewModel
     /// <summary>
     /// Parameters of the current View Model.
     /// </summary>
-    NameValueCollection RouteSegmentParameters { get; }
+    UnorderedKeyValueCollection RouteSegmentParameters { get; }
 }

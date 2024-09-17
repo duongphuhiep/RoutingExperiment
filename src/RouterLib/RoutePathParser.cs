@@ -6,7 +6,7 @@ namespace Starfruit.RouterLib;
 public record RouteSegment
 {
     public string? SegmentName { get; set; }
-    public NameValueCollection Parameters { get; set; } = new NameValueCollection();
+    public UnorderedKeyValueCollection Parameters { get; set; } = new UnorderedKeyValueCollection();
 }
 public static class RoutePathParser
 {
@@ -169,7 +169,7 @@ public static class RoutePathParser
         return builder.ToString();
     }
 
-    public static string EncodeSegment(string? segmentName, NameValueCollection parameters, bool endsWithSlash = true)
+    public static string EncodeSegment(string? segmentName, UnorderedKeyValueCollection parameters, bool endsWithSlash = true)
     {
         StringBuilder builder = new(EscapeReservesChars(segmentName));
         foreach (var key in parameters.AllKeys)

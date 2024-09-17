@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Starfruit.RouterLib;
-using System.Collections.Specialized;
 
 namespace DemoRoutingApp.ViewModels;
 
@@ -15,7 +14,7 @@ public abstract partial class RoutableViewModel : ViewModelBase, IRoutableViewMo
     private RouteNodeDefinition? _routeDefinition;
 
     [ObservableProperty]
-    private NameValueCollection _routeSegmentParameters;
+    private UnorderedKeyValueCollection _routeSegmentParameters;
 
     partial void OnRouteDefinitionChanged(RouteNodeDefinition? routeDefinition) => RegisterChildren();
 

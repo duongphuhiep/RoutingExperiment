@@ -1,6 +1,5 @@
 using Shouldly;
 using Starfruit.RouterLib;
-using System.Collections.Specialized;
 using System.Text;
 using Xunit.Abstractions;
 
@@ -203,7 +202,7 @@ public class RoutePathParserTests
         public IRoutableViewModel? Parent { get; set; }
         public RouteNodeDefinition? RouteDefinition { get; set; }
 
-        public NameValueCollection RouteSegmentParameters { get; } = new NameValueCollection();
+        public UnorderedKeyValueCollection RouteSegmentParameters { get; } = new UnorderedKeyValueCollection();
 
         public void OnRouteChanged(RouteChangedEvent e)
         {
