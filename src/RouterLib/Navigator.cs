@@ -31,6 +31,7 @@ public partial class Navigator : ObservableRecipient, INavigator
         Messenger.Send(new RouteChangingEvent { NewRouteSegments = parsedPath });
         foreach (var e in GetEventsWithCurrentNodeAndNextChildNode(parsedPath))
         {
+            Messenger.Send(new RouteSegmentChangingEvent(e));
             e.CurrentNode.CleanDeadComponents();
             foreach (var cachedComponent in e.CurrentNode.Components)
             {
@@ -39,9 +40,11 @@ public partial class Navigator : ObservableRecipient, INavigator
                 {
                     continue;
                 }
+
                 component.RouteSegmentParameters = e.CurrentParameters;
                 component.OnRouteChanged(e);
             }
+            Messenger.Send(e);
         }
         Messenger.Send(new RouteChangedEvent { NewRouteSegments = parsedPath });
     }
@@ -81,39 +84,33 @@ public partial class Navigator : ObservableRecipient, INavigator
     private List<RouteSegmentChangedEvent> GetEventsWithCurrentNodeOnly(QueueStack<RouteSegment> parsedPath)
     {
         List<RouteSegmentChangedEvent> result = new();
-        RouteSegmentChangedEvent routeChangedEvent = new RouteSegmentChangedEvent
+
+        var currentNodeDefinition = _root;
+        var currentNodeSegment = parsedPath.First;
+        result.Add(new RouteSegmentChangedEvent
         {
-            CurrentNode = _root,
+            CurrentNode = currentNodeDefinition,
             SegmentIndex = 0,
-            CurrentParameters = parsedPath.Dequeue().Parameters
-
-        };
-        result.Add(routeChangedEvent);
-
-        var currentNode = _root;
-        var i = 0;
-
-        foreach (var routeSegment in parsedPath)
+            CurrentParameters = currentNodeSegment.Value.Parameters
+        });
+        for (int i = 1; i < parsedPath.Count; i++)
         {
-            i++;
-            string? segment = routeSegment?.SegmentName;
-            if (string.IsNullOrEmpty(segment))
-            {
-                throw new InvalidRouteException($"Detected empty segment (at index {i}) in the path");
-            }
+            currentNodeSegment = currentNodeSegment.Next;
 
             //find route definition correspond to this segment
-            if (!currentNode.HasChild(segment!))
+            string? segment = currentNodeSegment.Value.SegmentName;
+            if (!currentNodeDefinition.HasChild(segment!))
             {
                 throw new RouteNotFoundException($"Route's definition not found for the Segment '{segment}' (at index {i}) in the path");
             }
-            currentNode = currentNode[segment!];
 
-            result.Add(routeChangedEvent with
+            currentNodeDefinition = currentNodeDefinition[segment!];
+
+            result.Add(new RouteSegmentChangedEvent
             {
-                CurrentNode = currentNode,
+                CurrentNode = currentNodeDefinition,
                 SegmentIndex = i,
-                CurrentParameters = routeSegment!.Parameters
+                CurrentParameters = currentNodeSegment.Value.Parameters
             });
         }
         return result;

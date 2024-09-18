@@ -55,7 +55,8 @@ public partial class WalletsViewModel : RoutableViewModel
 
     partial void OnSelectedWalletChanged(Wallet? value)
     {
-        _navigator.Goto(this, $"walletDetails:walletId={value?.Id}");
+        if (value is null) { return; }
+        _navigator.Goto(this, $"walletDetails:walletId={value.Id}");
     }
 
     public override void RegisterChildren()

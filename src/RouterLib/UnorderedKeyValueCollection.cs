@@ -5,6 +5,9 @@ namespace Starfruit.RouterLib;
 
 public class UnorderedKeyValueCollection : NameValueCollection
 {
+    /// <summary>
+    /// Ensure that no useless OnChanged events are raised by the MVVM Community Toolkit
+    /// </summary>
     public override bool Equals(object obj)
     {
         if (obj == null || GetType() != obj.GetType())
