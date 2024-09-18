@@ -14,12 +14,12 @@ public interface IRoutableViewModel
     void RegisterChildren();
 
     /// <summary>
-    /// Display the appropriated child View Model correspond to the <see cref="RouteChangedEvent.NextChildNode"/>
+    /// Display the appropriated child View Model correspond to the <see cref="RouteSegmentChangedEvent.NextChildNode"/>
     /// </summary>
-    void OnRouteChanged(RouteChangedEvent e);
+    void OnRouteChanged(RouteSegmentChangedEvent e);
 
     /// <summary>
     /// Parameters of the current View Model.
     /// </summary>
-    UnorderedKeyValueCollection RouteSegmentParameters { get; }
+    UnorderedKeyValueCollection? RouteSegmentParameters { get; set; }
 }

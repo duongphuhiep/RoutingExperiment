@@ -42,7 +42,7 @@ public partial class MainViewModel : RoutableViewModel
         this.RegisterChild("transfers", _transfersViewModel);
     }
 
-    public override void OnRouteChanged(RouteChangedEvent e)
+    public override void OnRouteChanged(RouteSegmentChangedEvent e)
     {
         SelectedTabValue = Tabs.First(t => e.NextChildNode!.SegmentName == t.Name);
     }

@@ -19,5 +19,5 @@ public abstract partial class RoutableViewModel : ViewModelBase, IRoutableViewMo
     partial void OnRouteDefinitionChanged(RouteNodeDefinition? routeDefinition) => RegisterChildren();
 
     public abstract void RegisterChildren();
-    public abstract void OnRouteChanged(RouteChangedEvent e);
+    public abstract void OnRouteChanged(RouteSegmentChangedEvent e);
 }

@@ -14,7 +14,7 @@
             <PageSlide Duration="0:00:00.500" />
         </StackPanel.Transitions>-->
         <Grid ColumnDefinitions="auto,*">
-            <ListBox Grid.Column="0"
+            <ListBox Grid.Column="0" MinWidth="200"
                      ItemsSource="{Binding Wallets^}"
                      SelectedItem="{Binding SelectedWallet}">
                 <ListBox.ItemTemplate>

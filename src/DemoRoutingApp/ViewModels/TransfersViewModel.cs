@@ -38,7 +38,7 @@ public partial class TransfersViewModel : RoutableViewModel
     {
     }
 
-    public override void OnRouteChanged(RouteChangedEvent e)
+    public override void OnRouteChanged(RouteSegmentChangedEvent e)
     {
     }
 }

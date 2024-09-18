@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Starfruit.RouterLib;
-using System.Web;
 
 namespace DemoRoutingApp.ViewModels;
 
-public partial class AddressBarViewModel : ViewModelBase
+public partial class AddressBarViewModel : ViewModelBase, IRecipient<RouteChangedEvent>
 {
     private readonly INavigator _navigator;
     [ObservableProperty]
@@ -13,14 +13,19 @@ public partial class AddressBarViewModel : ViewModelBase
 
     public AddressBarViewModel(INavigator navigator)
     {
-        HttpUtility.ParseQueryString("/a/bc");
         _navigator = navigator;
+        IsActive = true;
     }
 
     [RelayCommand]
     public void GotoRoute(string route)
     {
         _navigator.Goto(CurrentRoute);
+    }
+
+    public void Receive(RouteChangedEvent message)
+    {
+        CurrentRoute = message.NewRouteSegments.ToStringAddress();
     }
 }
 

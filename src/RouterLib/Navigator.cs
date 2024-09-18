@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using System.Collections.Generic;
 
 namespace Starfruit.RouterLib;
 
@@ -8,7 +10,7 @@ public interface INavigator
     string Goto(IRoutableViewModel fromViewModel, string targetRelativeAddress);
 }
 
-public class Navigator : INavigator
+public partial class Navigator : ObservableRecipient, INavigator
 {
     private readonly RouteNodeDefinition _root;
 
@@ -26,6 +28,7 @@ public class Navigator : INavigator
 
     private void Goto(QueueStack<RouteSegment> parsedPath)
     {
+        Messenger.Send(new RouteChangingEvent { NewRouteSegments = parsedPath });
         foreach (var e in GetEventsWithCurrentNodeAndNextChildNode(parsedPath))
         {
             e.CurrentNode.CleanDeadComponents();
@@ -36,9 +39,11 @@ public class Navigator : INavigator
                 {
                     continue;
                 }
+                component.RouteSegmentParameters = e.CurrentParameters;
                 component.OnRouteChanged(e);
             }
         }
+        Messenger.Send(new RouteChangedEvent { NewRouteSegments = parsedPath });
     }
 
     public string Goto(IRoutableViewModel fromViewModel, string targetRelativeAddress)
@@ -49,7 +54,7 @@ public class Navigator : INavigator
         return absolutePath.ToStringAddress();
     }
 
-    private IEnumerable<RouteChangedEvent> GetEventsWithCurrentNodeAndNextChildNode(QueueStack<RouteSegment> parsedPath)
+    private IEnumerable<RouteSegmentChangedEvent> GetEventsWithCurrentNodeAndNextChildNode(QueueStack<RouteSegment> parsedPath)
     {
         var routeChangedEvents = GetEventsWithCurrentNodeOnly(parsedPath);
         if (routeChangedEvents.Count == 1)
@@ -57,8 +62,8 @@ public class Navigator : INavigator
             yield return routeChangedEvents[0];
         }
 
-        RouteChangedEvent currentEvent;
-        RouteChangedEvent? nextEvent = null;
+        RouteSegmentChangedEvent currentEvent;
+        RouteSegmentChangedEvent? nextEvent = null;
 
         for (int i = 0; i < routeChangedEvents.Count - 1; i++)
         {
@@ -73,10 +78,10 @@ public class Navigator : INavigator
         yield return nextEvent!;
     }
 
-    private List<RouteChangedEvent> GetEventsWithCurrentNodeOnly(QueueStack<RouteSegment> parsedPath)
+    private List<RouteSegmentChangedEvent> GetEventsWithCurrentNodeOnly(QueueStack<RouteSegment> parsedPath)
     {
-        List<RouteChangedEvent> result = new();
-        RouteChangedEvent routeChangedEvent = new RouteChangedEvent
+        List<RouteSegmentChangedEvent> result = new();
+        RouteSegmentChangedEvent routeChangedEvent = new RouteSegmentChangedEvent
         {
             CurrentNode = _root,
             SegmentIndex = 0,
@@ -88,7 +93,7 @@ public class Navigator : INavigator
         var currentNode = _root;
         var i = 0;
 
-        while (parsedPath.TryDequeue(out var routeSegment))
+        foreach (var routeSegment in parsedPath)
         {
             i++;
             string? segment = routeSegment?.SegmentName;
@@ -102,10 +107,11 @@ public class Navigator : INavigator
             {
                 throw new RouteNotFoundException($"Route's definition not found for the Segment '{segment}' (at index {i}) in the path");
             }
+            currentNode = currentNode[segment!];
 
             result.Add(routeChangedEvent with
             {
-                CurrentNode = currentNode[segment!],
+                CurrentNode = currentNode,
                 SegmentIndex = i,
                 CurrentParameters = routeSegment!.Parameters
             });

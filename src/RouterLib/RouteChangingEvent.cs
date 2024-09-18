@@ -1,6 +1,6 @@
 ﻿namespace Starfruit.RouterLib;
 
-public record RouteChangedEvent
+public record RouteChangingEvent
 {
     /// <summary>
     /// Use <seealso cref="RoutePathParser.ToStringAddress(QueueStack{RouteSegment})"/> to convert this value to string.

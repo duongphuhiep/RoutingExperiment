@@ -1,13 +1,6 @@
-﻿using System.Collections.Specialized;
-using System.Text;
+﻿using System.Text;
 
 namespace Starfruit.RouterLib;
-
-public record RouteSegment
-{
-    public string? SegmentName { get; set; }
-    public UnorderedKeyValueCollection Parameters { get; set; } = new UnorderedKeyValueCollection();
-}
 public static class RoutePathParser
 {
     private enum TokenType
@@ -50,7 +43,7 @@ public static class RoutePathParser
                     }
                     else if (currentTokenType == TokenType.Value)
                     {
-                        currentRouteSegment.Parameters.Add(currentKey.ToString(), currentValue.ToString());
+                        currentRouteSegment.Parameters!.Add(currentKey.ToString(), currentValue.ToString());
                     }
                     else // currentTokenType == TokenType.Segment
                     {
@@ -169,17 +162,20 @@ public static class RoutePathParser
         return builder.ToString();
     }
 
-    public static string EncodeSegment(string? segmentName, UnorderedKeyValueCollection parameters, bool endsWithSlash = true)
+    public static string EncodeSegment(string? segmentName, UnorderedKeyValueCollection? parameters, bool endsWithSlash = true)
     {
         StringBuilder builder = new(EscapeReservesChars(segmentName));
-        foreach (var key in parameters.AllKeys)
+        if (parameters is not null)
         {
-            foreach (var value in parameters.GetValues(key))
+            foreach (var key in parameters.AllKeys)
             {
-                builder.Append(":");
-                builder.Append(EscapeReservesChars(key));
-                builder.Append("=");
-                builder.Append(EscapeReservesChars(value));
+                foreach (var value in parameters.GetValues(key))
+                {
+                    builder.Append(":");
+                    builder.Append(EscapeReservesChars(key));
+                    builder.Append("=");
+                    builder.Append(EscapeReservesChars(value));
+                }
             }
         }
         if (endsWithSlash)
@@ -192,12 +188,8 @@ public static class RoutePathParser
     public static string ToStringAddress(this QueueStack<RouteSegment> segments)
     {
         StringBuilder builder = new();
-        while (segments.TryDequeue(out var routeSegment))
+        foreach (var routeSegment in segments)
         {
-            if (routeSegment is null)
-            {
-                continue;
-            }
             builder.Append(EncodeSegment(routeSegment.SegmentName, routeSegment.Parameters));
         }
         return builder.ToString();

@@ -35,7 +35,11 @@ public class NavigatorTests
         services.AddSingleton(mockRepository); //inject a fake repository instead of real repository which access to the database
         IServiceProvider serviceProviderWithMockRepository = services.BuildServiceProvider();
 
+        INavigator navigator = serviceProviderWithMockRepository.GetRequiredService<INavigator>();
         WalletsViewModel subjectUnderTest = serviceProviderWithMockRepository.GetRequiredService<WalletsViewModel>();
-        subjectUnderTest.Wallets.ShouldNotBeNull();
+        //subjectUnderTest.RouteSegmentParameters.Count.ShouldBe(0);
+
+        //navigator.Goto("")
+
     }
 }

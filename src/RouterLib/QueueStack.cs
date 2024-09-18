@@ -3,15 +3,13 @@ using System.Collections.Generic;
 
 namespace Starfruit.RouterLib;
 
-public class QueueStack<T>
+public class QueueStack<T> : LinkedList<T>
 {
-    private readonly LinkedList<T> _list = new LinkedList<T>();
-
     /// <summary>
     /// Enqueue (FIFO) AddLast()
     /// </summary>
     /// <param name="item"></param>
-    public void Enqueue(T item) => _list.AddLast(item);
+    public void Enqueue(T item) => AddLast(item);
 
     /// <summary>
     /// Dequeue (FIFO) RemoveFirst()
@@ -20,13 +18,13 @@ public class QueueStack<T>
     /// <exception cref="InvalidOperationException"></exception>
     public bool TryDequeue(out T? value)
     {
-        if (_list.Count == 0)
+        if (Count == 0)
         {
             value = default;
             return false;
         }
-        value = _list.First.Value;
-        _list.RemoveFirst();
+        value = First.Value;
+        RemoveFirst();
         return true;
     }
 
@@ -57,14 +55,14 @@ public class QueueStack<T>
     /// <exception cref="InvalidOperationException"></exception>
     public bool TryPop(out T? value)
     {
-        if (_list.Count == 0)
+        if (Count == 0)
         {
             value = default;
             return false;
         }
 
-        value = _list.Last.Value;
-        _list.RemoveLast();
+        value = Last.Value;
+        RemoveLast();
         return true;
     }
 
@@ -82,7 +80,5 @@ public class QueueStack<T>
         return value!;
     }
 
-    public void Prepend(T item) => _list.AddFirst(item);
-
-    public int Count => _list.Count;
+    public void Prepend(T item) => AddFirst(item);
 }

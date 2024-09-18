@@ -10,7 +10,6 @@ public partial class WalletDetailViewModel : RoutableViewModel
 {
     private readonly IWalletRepository? _walletRepository;
 
-
     [ObservableProperty]
     private bool _isLoading;
 
@@ -28,15 +27,19 @@ public partial class WalletDetailViewModel : RoutableViewModel
         {
             return null;
         }
-        var walletId = RouteSegmentParameters["walletId"];
-        if (string.IsNullOrEmpty(walletId))
+        var walletIdString = RouteSegmentParameters["walletId"];
+        if (string.IsNullOrEmpty(walletIdString))
+        {
+            return null;
+        }
+        if (!int.TryParse(walletIdString, out var walletId))
         {
             return null;
         }
         IsLoading = true;
         try
         {
-            return await _walletRepository.GetWallet(1); //TODO
+            return await _walletRepository.GetWallet(walletId);
         }
         finally
         {
@@ -48,8 +51,9 @@ public partial class WalletDetailViewModel : RoutableViewModel
     {
     }
 
-    public override void OnRouteChanged(RouteChangedEvent e)
+    public override void OnRouteChanged(RouteSegmentChangedEvent e)
     {
+        OnPropertyChanged(nameof(Wallet));
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DemoRoutingApp.BusinessLogic;
+using DemoRoutingApp.Models;
 using Starfruit.RouterLib;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace DemoRoutingApp.ViewModels;
 public partial class WalletsViewModel : RoutableViewModel
 {
     private readonly IWalletRepository? _walletRepository;
-
+    private readonly INavigator _navigator;
     [ObservableProperty]
     private WalletDetailViewModel _walletDetailViewModel;
 
@@ -27,10 +28,11 @@ public partial class WalletsViewModel : RoutableViewModel
     [ObservableProperty]
     private Wallet? _selectedWallet;
 
-    public WalletsViewModel(IWalletRepository? walletRepository, WalletDetailViewModel walletDetailViewModel)
+    public WalletsViewModel(IWalletRepository? walletRepository, WalletDetailViewModel walletDetailViewModel, INavigator navigator)
     {
         _walletRepository = walletRepository;
         WalletDetailViewModel = walletDetailViewModel;
+        _navigator = navigator;
     }
 
     protected virtual async Task<IEnumerable<Wallet>> LoadWallets(WalletType? walletType)
@@ -51,9 +53,9 @@ public partial class WalletsViewModel : RoutableViewModel
         }
     }
 
-    partial void OnSelectedWalletChanged(Wallet value)
+    partial void OnSelectedWalletChanged(Wallet? value)
     {
-
+        _navigator.Goto(this, $"walletDetails:walletId={value?.Id}");
     }
 
     public override void RegisterChildren()
@@ -61,14 +63,14 @@ public partial class WalletsViewModel : RoutableViewModel
         this.RegisterChild("walletDetails", WalletDetailViewModel);
     }
 
-    public override void OnRouteChanged(RouteChangedEvent e)
+    public override void OnRouteChanged(RouteSegmentChangedEvent e)
     {
     }
 }
 
 public class WalletsViewModelForDesigner : WalletsViewModel
 {
-    public WalletsViewModelForDesigner() : base(null, new WalletDetailViewModelForDesigner())
+    public WalletsViewModelForDesigner() : base(null, new WalletDetailViewModelForDesigner(), new Navigator(RouterConfig.Root))
     {
     }
 

@@ -1,6 +1,5 @@
 using Shouldly;
 using Starfruit.RouterLib;
-using System.Text;
 using Xunit.Abstractions;
 
 namespace DemoRoutingApp.UnitTests;
@@ -129,16 +128,7 @@ public class RoutePathParserTests
     public void EncodeSegementTest(string description, string route)
     {
         var result = RoutePathParser.Parse(route);
-        StringBuilder builder = new();
-        while (result.TryDequeue(out var routeSegment))
-        {
-            if (routeSegment is null)
-            {
-                continue;
-            }
-            builder.Append(RoutePathParser.EncodeSegment(routeSegment.SegmentName, routeSegment.Parameters));
-        }
-        builder.ToString().ShouldBe(route);
+        result.ToStringAddress().ShouldBe(route);
     }
 
     [Theory()]
@@ -202,9 +192,9 @@ public class RoutePathParserTests
         public IRoutableViewModel? Parent { get; set; }
         public RouteNodeDefinition? RouteDefinition { get; set; }
 
-        public UnorderedKeyValueCollection RouteSegmentParameters { get; } = new UnorderedKeyValueCollection();
+        public UnorderedKeyValueCollection RouteSegmentParameters { get; set; } = new UnorderedKeyValueCollection();
 
-        public void OnRouteChanged(RouteChangedEvent e)
+        public void OnRouteChanged(RouteSegmentChangedEvent e)
         {
             throw new NotImplementedException();
         }
