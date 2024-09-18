@@ -20,6 +20,7 @@ public partial class AddressBarViewModel : ViewModelBase, IRecipient<RouteChange
     [RelayCommand]
     public void GotoRoute(string route)
     {
+        Messenger.Send(new RefreshApplicationRequest());
         _navigator.Goto(CurrentRoute);
     }
 
